@@ -1,21 +1,29 @@
 import React, { useEffect } from "react";
+import { joinRoom, leaveRoom } from "../api/roomApi";
+import { v4 as uuidv4 } from "uuid";
 
 const JitsiMeet = ({ roomName, displayName }) => {
   useEffect(() => {
+    const username = displayName || "Guest";
+    const deviceInfo = navigator.userAgent;
+
+    joinRoom(roomName, username, deviceInfo);
+
     const domain = "8x8.vc";
     const options = {
       roomName: `vpaas-magic-cookie-30a65e771f894191bfb18b824b42e495/${roomName}`,
       parentNode: document.getElementById("jitsi-container"),
       userInfo: {
-        displayName: displayName || "Guest",
+        displayName: username,
       },
-      // Optional: Add JWT token if needed
-      // jwt: "YOUR_JWT_TOKEN",
     };
 
     const api = new window.JitsiMeetExternalAPI(domain, options);
 
-    return () => api?.dispose(); // clean up on component unmount
+    return () => {
+      leaveRoom(roomName, username);
+      api?.dispose();
+    };
   }, [roomName, displayName]);
 
   return (

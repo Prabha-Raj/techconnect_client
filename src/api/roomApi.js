@@ -4,20 +4,25 @@ const API = axios.create({
   baseURL: import.meta.env.VITE_BACKEND_URL || "http://localhost:5000/api",
 });
 
-// ✅ Create a room
 export const createRoom = (roomId, createdBy) =>
   API.post("/rooms", { roomId, createdBy });
 
-// ✅ Check if a room exists
 export const getRoom = (roomId) => API.get(`/rooms/${roomId}`);
 
-// ✅ Get all available rooms
 export const getAllRooms = async () => {
   try {
     const res = await API.get("/rooms");
     return res.data;
-  } catch (err) {
-    console.error("Error fetching rooms", err);
+  } catch {
     return [];
   }
 };
+
+export const joinRoom = (roomId, username, deviceInfo) =>
+  API.post("/rooms/join", { roomId, username, deviceInfo });
+
+export const leaveRoom = (roomId, username) =>
+  API.post("/rooms/leave", { roomId, username });
+
+export const getRoomAnalytics = (roomId) =>
+  API.get(`/rooms/${roomId}/analytics`);

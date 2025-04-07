@@ -9,7 +9,6 @@ const Home = () => {
   const [availableRooms, setAvailableRooms] = useState([]);
   const navigate = useNavigate();
 
-  // Fetch available rooms on mount
   useEffect(() => {
     const fetchRooms = async () => {
       const data = await getAllRooms();
@@ -22,7 +21,6 @@ const Home = () => {
     fetchRooms();
   }, []);
 
-  // Create Room
   const handleCreate = async () => {
     if (!createName) {
       alert("Please enter your name to create a room.");
@@ -33,19 +31,26 @@ const Home = () => {
 
     try {
       await createRoom(newRoomId, createName);
-      navigate(`/room/${newRoomId}?name=${encodeURIComponent(createName)}`);
+      const data = await getAllRooms();
+      const roomsArray = Object.entries(data || {}).map(([id, room]) => ({
+        roomId: id,
+        ...room,
+      }));
+      setAvailableRooms(roomsArray);
+      // localStorage.setItem("username", createName);
+      // navigate(`/room/${newRoomId}?name=${encodeURIComponent(createName)}`);
     } catch (err) {
       alert("Error creating room: " + err.message);
     }
   };
 
-  // Join selected room
   const handleConnect = (roomId) => {
     if (!joinName) {
       alert("Please enter your name before joining a room.");
       return;
     }
 
+    localStorage.setItem("username", joinName);
     navigate(`/room/${roomId}?name=${encodeURIComponent(joinName)}`);
   };
 
@@ -56,7 +61,6 @@ const Home = () => {
         <p className="text-lg text-gray-300">Create or join a real-time video room</p>
       </div>
 
-      {/* Create Room */}
       <div className="w-full max-w-xl bg-white p-6 rounded-2xl shadow-xl mb-10">
         <h2 className="text-2xl font-semibold text-indigo-700 mb-4">🎦 Create a Room</h2>
         <input
@@ -74,7 +78,6 @@ const Home = () => {
         </button>
       </div>
 
-      {/* Join Room */}
       <div className="w-full max-w-5xl">
         <div className="mb-4 text-white text-xl font-medium">🙋‍♂️ Join an Existing Room</div>
         <input
